@@ -49,7 +49,7 @@ public class ActivitySecond extends AppCompatActivity {
 
 
                 //Verifica que los campos estén llenos
-                if(pro.length() > 0 && mercha.length() > 0 && emi.length() > 0 && cod.length() > 0){
+                if(pro.length() > 0 && mercha.length() > 0 && cod.length() > 0){
 
                     if(ActivitySecond.isNumeric(cod) == true){
 
@@ -63,7 +63,7 @@ public class ActivitySecond extends AppCompatActivity {
                         //       + Adaptador.mechardising + ", " + Adaptador.emisora + ", " + Adaptador.codigo + ") VALUES ( '"
                         //        + pro + "', '" + mercha + "', '" + emi + "', '" + cod + "')";
 
-                        db.execSQL(Adaptador.insertar(pro, mercha, emi, cod));
+                        db.execSQL(Adaptador.insertarEmpresa(pro, mercha, cod));
 
                         //db.execSQL(insert);
                         db.close();

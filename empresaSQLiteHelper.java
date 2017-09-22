@@ -15,13 +15,23 @@ public class empresaSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(Adaptador.sqlCreate);
+        db.execSQL(Adaptador.sqlCreateEmpresa);
+        db.execSQL(Adaptador.sqlCreatePartido);
+        db.execSQL(Adaptador.getSqlCreateTransmision);
+        db.execSQL(Adaptador.getSqlCreateHorasRegistradas);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXIST Empresa");
-        db.execSQL(Adaptador.sqlCreate);
+        db.execSQL(Adaptador.sqlCreateEmpresa);
+        db.execSQL("DROP TABLE IF EXIST Partido");
+        db.execSQL(Adaptador.sqlCreatePartido);
+        db.execSQL("DROP TABLE IF EXIST Transmision");
+        db.execSQL(Adaptador.getSqlCreateTransmision);
+        db.execSQL("DROP TABLE IF EXIST HorasRegistradas");
+        db.execSQL(Adaptador.getSqlCreateHorasRegistradas);
 
     }
 }

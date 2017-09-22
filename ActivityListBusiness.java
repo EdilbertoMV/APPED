@@ -161,8 +161,8 @@ public class ActivityListBusiness extends AppCompatActivity {
             empresa = new Empresa();
             empresa.setNombre(cursor.getString(0));
             empresa.setMechardising(cursor.getString(1));
-            empresa.setEmisora(cursor.getString(2));
-            empresa.setCodigo(cursor.getInt(3));
+            //empresa.setEmisora(cursor.getString(2));
+            empresa.setCodigo(cursor.getInt(2));
             empresa.setFoto(R.drawable.ic_imagep);
 
             listaEmpresas.add(empresa);

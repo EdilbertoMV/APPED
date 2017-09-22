@@ -22,8 +22,8 @@ public class ActivityEdit extends AppCompatActivity {
 
         valores.put(Adaptador.nombre, nombre);
         valores.put(Adaptador.mechardising, mechardising);
-        valores.put(Adaptador.emisora, emisora);
-        valores.put(Adaptador.codigo, codigo);
+        //valores.put(Adaptador.emisora, emisora);
+        valores.put(Adaptador.codigoEmpresa, codigo);
 
         return valores;
     }
