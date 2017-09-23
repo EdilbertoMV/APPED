@@ -1,6 +1,7 @@
 package app.oneapp.eddy.myapp.com.oneapp;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
@@ -22,8 +23,7 @@ public class ActivityListBusiness extends AppCompatActivity {
     RecyclerView recyclerEmpresas;
 
     empresaSQLiteHelper  conn;
-    //empresaSQLiteHelper Empresa = new empresaSQLiteHelper(ActivityListBusiness.this, "dbEmpresas", null, 1);
-    //SQLiteDatabase db = Empresa.getWritableDatabase();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,20 +35,14 @@ public class ActivityListBusiness extends AppCompatActivity {
         listaEmpresas = new ArrayList<>();
 
         recyclerEmpresas = (RecyclerView) findViewById(R.id.recyclerid);
-        //recyclerEmpresas.setLayoutManager(new LinearLayoutManager(this));
         recyclerEmpresas.setLayoutManager(new GridLayoutManager(this, 3));
 
         consultarListaEmpresas();
 
-        //Log.i("INFO", String.valueOf(listaEmpresas.get(0)));
-        //llenarEmpresas();
-
-       // AdaptadorEmpresas adapter = new AdaptadorEmpresas((listaEmpresas));
-        //recyclerEmpresas.setAdapter(adapter);
+        empresaSQLiteHelper empresa = new empresaSQLiteHelper(ActivityListBusiness.this, "dbEmpresas", null, 1);
+        final SQLiteDatabase db = empresa.getWritableDatabase();
 
         AdaptadorEmpresas adapter = new AdaptadorEmpresas((listaEmpresas));
-
-
 
         adapter.setOnClickListener(new View.OnClickListener(){
 
@@ -60,45 +54,38 @@ public class ActivityListBusiness extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
                 final String hora = sdf.format(date);
 
-                final String[] opciones = {"Confirmar", "Cancelar", "Otra empresa"};
-                final String[] opcionesEmpresas;
+                final String[] opciones = {"Editar", "Eliminar", "Cancelar"};
+                final String[] opcionesEliminar  = {"Aceptar", "Cancelar"};
 
-                opcionesEmpresas = new String[listaEmpresas.size()];
 
-                for(int i=0; i < listaEmpresas.size(); i++){
+                final AlertDialog.Builder alertOpcionesEliminar = new AlertDialog.Builder(ActivityListBusiness.this);
+                alertOpcionesEliminar.setTitle("Seleccione una Opción");
 
-                    opcionesEmpresas[i] = listaEmpresas.get(i).getNombre();
-                }
-
-                final AlertDialog.Builder alertOpcionesEmpresas = new AlertDialog.Builder(ActivityListBusiness.this);
-                alertOpcionesEmpresas.setTitle("Seleccione una Opción");
-
-                alertOpcionesEmpresas.setItems(opcionesEmpresas, new DialogInterface.OnClickListener() {
+                alertOpcionesEliminar.setItems(opcionesEliminar, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        if (opcionesEmpresas[i].equals("eddy")) {
+                        if (opcionesEliminar[i].equals("Aceptar")) {
 
-                            Toast.makeText(getApplicationContext(),
-                                    listaEmpresas.get(recyclerEmpresas.getChildAdapterPosition(view)).getNombre() +
-                                            " Hora: " + hora,
+
+                            int oli = listaEmpresas.get(recyclerEmpresas.getChildAdapterPosition(view)).getCodigo();
+                            String s = Integer.toString(oli);
+
+                            db.delete(Adaptador.tabla_empresa, Adaptador.codigoEmpresa + "=?", new String[]{s});
+
+                            Intent intent = getIntent();
+                            finish();
+                            startActivity(intent);
+
+                            Toast.makeText(getApplicationContext(), "SE HA ELIMINADO LA EMPRESA",
                                     Toast.LENGTH_SHORT).show();
 
-                        } else {
-                            if (opcionesEmpresas[i].equals("Confirmar")) {
+                        }else{
+                            if (opcionesEliminar[i].equals("Cancelar")) {
 
                                 dialogInterface.dismiss();
 
-                            } else {
-                                if (opcionesEmpresas[i].equals("Confirmar")) {
 
-                                    dialogInterface.dismiss();
-
-                                } else {
-
-                                    dialogInterface.dismiss();
-
-                                }
                             }
                         }
                     }
@@ -112,25 +99,34 @@ public class ActivityListBusiness extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        if (opciones[i].equals("Confirmar")) {
+                        if (opciones[i].equals("Editar")) {
 
-                            Toast.makeText(getApplicationContext(),
-                                    listaEmpresas.get(recyclerEmpresas.getChildAdapterPosition(view)).getNombre() +
-                                            " Hora: " + hora,
-                                    Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(ActivityListBusiness.this, ActivityEdit.class);
+
+                            String name = listaEmpresas.get(recyclerEmpresas.getChildAdapterPosition(view)).getNombre();
+                            String mec = listaEmpresas.get(recyclerEmpresas.getChildAdapterPosition(view)).getMechardising();
+                            int cod = listaEmpresas.get(recyclerEmpresas.getChildAdapterPosition(view)).getCodigo();
+                            String codigoS = Integer.toString(cod);
+
+                            //Pasar a activity Edit pasar datos de empresa
+                            intent.putExtra("nombreI", name);
+                            intent.putExtra("mecharI", mec);
+                            intent.putExtra("codigoI", codigoS);
+
+                            startActivity(intent);
 
                         } else {
-                            if (opciones[i].equals("Cancelar")) {
+                            if (opciones[i].equals("Eliminar")) {
+
+                                //Eliminar empresa de la db
+                                alertOpcionesEliminar.show();
 
                                 dialogInterface.dismiss();
 
                             } else {
-                                if (opciones[i].equals("Otra empresa")) {
+                                if (opciones[i].equals("Cancelar")) {
 
                                     dialogInterface.dismiss();
-
-                                    alertOpcionesEmpresas.show();
-
                                 }
 
                             }
@@ -139,7 +135,6 @@ public class ActivityListBusiness extends AppCompatActivity {
                 });
 
                 alertOpciones.show();
-
 
             }
         });
@@ -161,7 +156,31 @@ public class ActivityListBusiness extends AppCompatActivity {
             empresa = new Empresa();
             empresa.setNombre(cursor.getString(0));
             empresa.setMechardising(cursor.getString(1));
-            //empresa.setEmisora(cursor.getString(2));
+            empresa.setCodigo(cursor.getInt(2));
+            empresa.setFoto(R.drawable.ic_imagep);
+
+            listaEmpresas.add(empresa);
+        }
+        db.close();
+    }
+
+    public  void encontrarEmpresa(){
+
+        SQLiteDatabase db = conn.getReadableDatabase();
+
+        Empresa empresa = null;
+
+        //select nombre, mechardising, emisora, codigo
+        //from empresa
+        //where codigo = 999
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Adaptador.tabla_empresa, null);
+
+        while(cursor.moveToNext()){
+
+            empresa = new Empresa();
+            empresa.setNombre(cursor.getString(0));
+            empresa.setMechardising(cursor.getString(1));
             empresa.setCodigo(cursor.getInt(2));
             empresa.setFoto(R.drawable.ic_imagep);
 
@@ -169,21 +188,4 @@ public class ActivityListBusiness extends AppCompatActivity {
         }
 
     }
-
-    /*
-    public void llenarEmpresas(){
-
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-        listaEmpresas.add(new EmpresaVO("Eddy", R.drawable.ic_imagep));
-
-
-    }*/
 }

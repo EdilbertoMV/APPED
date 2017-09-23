@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 public class ActivityInicio extends AppCompatActivity {
 
@@ -31,7 +30,7 @@ public class ActivityInicio extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener(){
                                    @Override
                                    public void onClick(View view) {
-                                       Intent intent = new Intent(ActivityInicio.this, ActivitySecond.class);
+                                       Intent intent = new Intent(ActivityInicio.this, ActivityCreate.class);
                                        //intent.putExtra("g",gg );
                                        startActivity(intent);
                                    }

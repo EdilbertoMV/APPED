@@ -44,8 +44,6 @@ public class Adaptador {
             + codigoTransmision + " INTEGER PRIMARY KEY NOT NULL, "
             + "FOREIGN KEY(codigoTransmision) REFERENCES Transmision(codigoTransmision))";
 
-
-
     public static String insertarEmpresa(String pro, String mercha, String cod) {
 
         String insert = "INSERT INTO " + Adaptador.tabla_empresa + " (" + Adaptador.nombre + ", "

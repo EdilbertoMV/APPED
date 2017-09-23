@@ -12,17 +12,16 @@ import android.widget.Toast;
 
 public class ActivityEdit extends AppCompatActivity {
 
-    private View btn;
-    EditText edtProducto, edtMerchandising, edtEmisora, edtCodigo;
+    private View btn, btn2;
+    EditText edtProducto, edtMerchandising, edtCodigo;
 
 
-    private ContentValues generarContentValues(String nombre, String mechardising, String emisora, String codigo){
+    private ContentValues generarContentValues(String nombre, String mechardising, String codigo){
 
         ContentValues valores = new ContentValues();
 
         valores.put(Adaptador.nombre, nombre);
         valores.put(Adaptador.mechardising, mechardising);
-        //valores.put(Adaptador.emisora, emisora);
         valores.put(Adaptador.codigoEmpresa, codigo);
 
         return valores;
@@ -38,54 +37,126 @@ public class ActivityEdit extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
-        edtProducto = (EditText) findViewById(R.id.eTProducto);
-        edtMerchandising = (EditText) findViewById(R.id.eTMerchandising);
-        edtEmisora = (EditText) findViewById(R.id.eTEmisora);
-        edtCodigo = (EditText) findViewById(R.id.eTCodigo);
-
-        Toast.makeText(ActivityEdit.this, "Ingrese los datos por favor.", Toast.LENGTH_SHORT).show();
-
+        edtProducto = (EditText) findViewById(R.id.eTProductoEdit);
+        edtMerchandising = (EditText) findViewById(R.id.eTMerchandisingEdit);
+        edtCodigo = (EditText) findViewById(R.id.eTCodigoEdit);
         btn = (Button) findViewById(R.id.buttonActualizar);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btn2 = (Button) findViewById(R.id.buttonCancelarEdit);
 
-                String pro = edtProducto.getText().toString();
-                String mercha = edtMerchandising.getText().toString();
-                String emi = edtEmisora.getText().toString();
-                String cod = edtCodigo.getText().toString();
 
-                empresaSQLiteHelper empresa = new empresaSQLiteHelper(ActivityEdit.this, "dbEmpresas", null, 1);
-                SQLiteDatabase db = empresa.getWritableDatabase();
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
 
-                if(ActivitySecond.isNumeric(cod) == true){
+        if(extras != null && extras.getString("nombreI") != null){
 
-                    //String hol = "999";
-                    //db.update(Adaptador.tabla_empresa, generarContentValues(pro, mercha, emi, cod), Adaptador.codigo + "=?", new String[]{hol});
+            String nombreIn = extras.getString("nombreI");
+            String mecharIn = extras.getString("mecharI");
+            final String codIn = extras.getString("codigoI");
 
-                    db.execSQL("UPDATE " + Adaptador.tabla_empresa + " SET nombre = 'edd' WHERE codigo = 123 ");
-                    //modificarNombre(pro, mercha, emi, cod);
+            edtProducto.setText(nombreIn);
+            edtMerchandising.setText(mecharIn);
+            edtCodigo.setText(codIn);
 
-                    db.close();
+            Toast.makeText(ActivityEdit.this, "Ingrese los datos por favorED.", Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(ActivityEdit.this, "¡SE MODIFICÖ LA EMPRESA!", Toast.LENGTH_SHORT).show();
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                    //Limpia los campos
-                    edtProducto.setText("");
-                    edtMerchandising.setText("");
-                    edtEmisora.setText("");
-                    edtCodigo.setText("");
+                    String nuevoNombre = edtProducto.getText().toString();
+                    String nuevoMechar = edtMerchandising.getText().toString();
+                    String nuevoCodigo = edtCodigo.getText().toString();
+
+                    empresaSQLiteHelper empresa = new empresaSQLiteHelper(ActivityEdit.this, "dbEmpresas", null, 1);
+                    SQLiteDatabase db = empresa.getWritableDatabase();
+
+                    if(ActivityCreate.isNumeric(nuevoCodigo) == true){
+
+                        //db.update(Adaptador.tabla_empresa, generarContentValues(pro, mercha, emi, cod), Adaptador.codigo + "=?", new String[]{hol});
+
+                        db.execSQL("UPDATE " + Adaptador.tabla_empresa + " SET nombre = '" + nuevoNombre + "', "
+                                + "mechardising = '" + nuevoMechar + "', " + "codigoEmpresa = " + nuevoCodigo
+                                + " WHERE codigoEmpresa = " + codIn);
+                        //modificarNombre(pro, mercha, emi, cod);
+
+                        db.close();
+
+                        Toast.makeText(ActivityEdit.this, "¡SE MODIFICÖ LA EMPRESA!", Toast.LENGTH_SHORT).show();
+
+                        //Limpia los campos
+                        edtProducto.setText("");
+                        edtMerchandising.setText("");
+                        edtCodigo.setText("");
+
+                        //Volver a la activity  inicio
+                        Intent intent = new Intent(ActivityEdit.this, ActivityInicio.class);
+                        startActivity(intent);
+
+                        //Algún campo sin llenar
+                    }else {
+                        Toast.makeText(ActivityEdit.this, "¡Paila el codigo debe ser númerico!", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            });
+
+            btn2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
                     //Volver a la activity  inicio
                     Intent intent = new Intent(ActivityEdit.this, ActivityInicio.class);
                     startActivity(intent);
-
-                    //Algún campo sin llenar
-                }else {
-                    Toast.makeText(ActivityEdit.this, "¡Paila!", Toast.LENGTH_SHORT).show();
-
                 }
-            }
-        });
+            });
+
+        }else{
+
+            Toast.makeText(ActivityEdit.this, "Ingrese los datos por favor.", Toast.LENGTH_SHORT).show();
+
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    String pro = edtProducto.getText().toString();
+                    String mercha = edtMerchandising.getText().toString();
+                    String cod = edtCodigo.getText().toString();
+
+                    empresaSQLiteHelper empresa = new empresaSQLiteHelper(ActivityEdit.this, "dbEmpresas", null, 1);
+                    SQLiteDatabase db = empresa.getWritableDatabase();
+
+                    if(ActivityCreate.isNumeric(cod) == true){
+
+                        //String hol = "999";
+                        //db.update(Adaptador.tabla_empresa, generarContentValues(pro, mercha, emi, cod), Adaptador.codigo + "=?", new String[]{hol});
+
+                        db.execSQL("UPDATE " + Adaptador.tabla_empresa + " SET nombre = 'edd' WHERE codigo = 123 ");
+                        //modificarNombre(pro, mercha, emi, cod);
+
+                        db.close();
+
+                        Toast.makeText(ActivityEdit.this, "¡SE MODIFICÖ LA EMPRESA!", Toast.LENGTH_SHORT).show();
+
+                        //Limpia los campos
+                        edtProducto.setText("");
+                        edtMerchandising.setText("");
+                        edtCodigo.setText("");
+
+                        //Volver a la activity  inicio
+                        Intent intent = new Intent(ActivityEdit.this, ActivityInicio.class);
+                        startActivity(intent);
+
+                        //Algún campo sin llenar
+                    }else {
+                        Toast.makeText(ActivityEdit.this, "¡Paila!", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            });
+
+        }
+
+
+
     }
 }
